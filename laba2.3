@@ -1,0 +1,42 @@
+import numpy as np
+import time
+from scipy.linalg.blas import sgemm
+import os
+
+def setup_environment():
+    os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
+    os.environ['OPENBLAS_NUM_THREADS'] = str(os.cpu_count())
+
+def generate_matrices(n):
+    rng = np.random.default_rng()
+    A = np.ascontiguousarray(rng.random((n, n), dtype=np.float32))
+    B = np.ascontiguousarray(rng.random((n, n), dtype=np.float32))
+    return A, B
+
+def warmup_blas():
+    small_A, small_B = generate_matrices(64)
+    for _ in range(10):
+        sgemm(1.0, small_A, small_B)
+
+def main():
+    setup_environment()
+    warmup_blas()
+    
+    n = 2048
+    A, B = generate_matrices(n)
+    
+    start = time.perf_counter()
+    C = sgemm(1.0, A, B)
+    end = time.perf_counter()
+    
+    t = end - start
+    c = 2 * n**3
+    mflops = c / t * 1e-6
+    
+    print(f"Размер матрицы: {n}x{n}")
+    print(f"Время выполнения: {t:.4f} секунд")
+    print(f"Теоретическая сложность: {c} операций")
+    print(f"Производительность: {mflops:.2f} MFlops")
+
+if __name__ == "__main__":
+    main()
