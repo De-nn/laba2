@@ -1,0 +1,25 @@
+import numpy as np
+import time
+
+def generate_matrices(n):
+    return np.random.rand(n, n).astype(np.float32), np.random.rand(n, n).astype(np.float32)
+
+def matrix_multiply_optimized(A, B):
+    return np.dot(A, B)
+
+n = 2048
+A, B = generate_matrices(n)
+
+start = time.perf_counter()
+C = matrix_multiply_optimized(A, B)
+end = time.perf_counter()
+
+t = end - start
+c = 2 * n**3
+mflops = c / t * 1e-6
+
+print(f"Размер матрицы: {n}x{n}")
+print(f"Время выполнения: {t:.4f} секунд")
+print(f"Теоретическая сложность: {c} операций")
+print(f"Производительность: {mflops:.2f} MFlops")
+print("Мурмаль Д.С., 020303-АИСа-о24")
